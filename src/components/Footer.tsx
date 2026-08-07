@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { TenantBundle } from "@/types";
 import { buildMapsUrls } from "@/lib/geo/distance";
 
@@ -80,12 +81,12 @@ export function Footer({ tenant }: { tenant: TenantBundle }) {
               </a>
             </li>
             <li>
-              <a
+              <Link
                 href="/merchant/dashboard"
                 className="text-zinc-200 hover:text-white"
               >
                 Merchant CRM Login
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -162,9 +163,9 @@ export function Footer({ tenant }: { tenant: TenantBundle }) {
             >
               GDPR Cookie Preferences
             </button>
-            <a href="/" className="font-semibold text-[var(--accent)] hover:text-white">
+            <Link href="/" className="font-semibold text-[var(--accent)] hover:text-white">
               Nexus platform
-            </a>
+            </Link>
           </div>
         </div>
       </div>
