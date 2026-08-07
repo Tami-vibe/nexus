@@ -50,7 +50,12 @@ export default async function TenantPage({
   if (!tenant) notFound();
 
   if (tenant.walk_in_enabled) {
-    await resolveCapacity(tenant);
+    try {
+      await resolveCapacity(tenant);
+    } catch {
+      // Live capacity is a non-blocking enhancement — a Redis/queue outage
+      // must never take down the whole storefront.
+    }
   }
 
   try {
