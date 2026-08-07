@@ -1,0 +1,43 @@
+{
+  "name": "nexus-os",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "dev:up": "docker compose up -d",
+    "dev:down": "docker compose down",
+    "db:migrate": "node --env-file=.env scripts/migrate.mjs",
+    "db:seed": "node --env-file=.env scripts/seed.mjs",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "smoke:holds": "node --env-file=.env scripts/smoke-holds.mjs",
+    "test:qa": "node --env-file=.env --test tests/**/*.test.mjs"
+  },
+  "dependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@radix-ui/react-popover": "^1.1.21",
+    "dotenv": "^17.4.2",
+    "ioredis": "^5.6.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.26.0",
+    "next": "^15.5.21",
+    "pg": "^8.16.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20.19.9",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "^15.5.21",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.8.3"
+  }
+}

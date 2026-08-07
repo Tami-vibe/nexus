@@ -1,0 +1,224 @@
+# Nexus OS — Project Rules (Enforced)
+
+You are building Nexus OS: an autonomous commerce platform for local merchants spanning products, services, and capacity — not a developer console.
+
+## Design Rule (Non-Negotiable)
+
+- Use Tailwind CSS with modern UI/UX principles at **Apple / Stripe-level** quality.
+- Prefer light, high-trust surfaces, generous whitespace, refined typography, and rich visual media (hero imagery, product showcases, video testimonial placeholders).
+- Include intentional micro-animations (entrance, hover, focus) — never noisy motion.
+- High contrast, readable type scales. Distinctive font pairing (never default Inter/Roboto/Arial/system stacks as the brand voice).
+- **FORBIDDEN:** plain dark “database dump” lists, dense debug tables as primary UI, purple-gradient SaaS clichés, generic AI landing templates.
+- Landing first viewport: one composition — brand as hero signal, one headline, one supporting line, one CTA group, one dominant visual. No card clutter in the hero.
+- Cards are allowed only when they contain a real user interaction (product buy, book slot, CRM board cards).
+
+## COLOR CONSTRAINT (Non-Negotiable)
+
+Strict adherence to **Monochrome + Clementine** brand identity (Swedish / Stockholm minimalism):
+
+| Role | Token | Hex |
+|---|---|---|
+| Off-white base | `--paper` | `#F9F9FB` |
+| Pure white elevated | `--paper-elevated` | `#FFFFFF` |
+| Obsidian ink / dark surfaces | `--ink` / zinc-900 | `#09090B` / `#18181B` |
+| Brand accent | `--accent` / Clementine | `#FF5E1A` |
+
+- **Exactly ONE** Clementine primary button per visible viewport section — reserved for `[ Book ]`, `[ Reserve ]`, or `[ Buy ]` only (`bg-[#FF5E1A] text-white hover:bg-[#E55013]`).
+- Secondary controls: solid Obsidian (`bg-zinc-900 text-white`) or outlined zinc (`border border-zinc-300 text-zinc-900 bg-transparent hover:bg-zinc-50`).
+- **No greens, muted teals, or blue gradients** on primary UI chrome (live-capacity 🟢 emoji indicator is the only green exception).
+
+## STOCKHOLM RULE (Non-Negotiable)
+
+Never use box-shadows (`shadow-*`). Maintain a 1-orange-button limit per section. Keep secondary controls strictly monochrome with 1px zinc borders (`border-zinc-200`). Depth = crisp borders + whitespace only.
+
+- **Buttons** (`rounded-xl px-5 py-3 font-semibold`): user actions only (Book, Directions, Submit, Learn More).
+- **Pills** (`rounded-full px-3 py-1 text-xs font-medium bg-zinc-100 text-zinc-700`): non-clickable tags, availability states, language badges, time filters.
+
+## E-Commerce & Services Rule
+
+Every merchant page (`app/[vat]/...`) MUST support **three offer types**:
+
+1. **Physical / Digital Products** — catalog with 1-click buy (Stripe / Apple Pay seam).
+2. **Scheduled Appointments & Services** — doctors, consultants, artisans, podiatrists, etc.
+3. **Real-Time Walk-Ins / Pass Capacity** — gyms, pools, salons — shown **only** when `walk_in_enabled` is true.
+
+Capacity/occupancy is **one module**, not the product. Do not center the entire UX on walk-ins.
+
+Sectors include (not limited to): `GYM`, `SALON`, `CLINIC`, `POOL`, `RETAIL`, `ARTISAN`, `DIGITAL`, `CONSULTING`.
+
+## CRM Integration Rule
+
+Every meaningful user event MUST automatically log to:
+
+- `lead_profiles` (identity + `intent_score` + lifecycle)
+- `crm_events` (unified activity stream)
+
+Required event types include at minimum:
+
+`PAGE_VIEW`, `LEAD_CAPTURE`, `CHAT_OPEN`, `CHAT_MESSAGE`, `CART_ADD`, `CART_DROP`, `ORDER_PLACED`, `APPOINTMENT_BOOKED`, `HOLD`, `CHECKOUT_MOCK`, `CHECKOUT_PAID`
+
+The merchant CRM (`app/merchant/dashboard`) is the visual hub for these events — Kanban / lead lists, purchases, appointments, chat transcripts, live activity feed. Never ship merchant UI that looks like a raw SQL dump.
+
+## Architecture Constraints
+
+- Keep Auth, GDPR, Stripe, and QA as modular wrap-arounds around the commerce core.
+- Multi-tenant routing remains path-based `/{vat}` (custom domains are a launch seam).
+- Postgres is source of truth; Redis is for atomic capacity holds only.
+- Prefer small focused files under `src/components/`, `src/lib/`, `src/app/`.
+- No production secrets in the repo. Use `.env.example` for required keys.
+
+## File Organization
+
+```
+src/app/[vat]/          # public merchant storefront
+src/app/merchant/        # merchant portal + CRM
+src/components/storefront/
+src/components/crm/
+src/components/marketing/
+src/lib/commerce/        # products, appointments, checkout
+src/lib/crm/             # event logging, scoring
+```
+
+## Copy & Product Voice
+
+- Outcome-driven, trust-building, specific. No “synergy” filler.
+- Name UI by what merchants and buyers do, not by internal systems.
+
+## STRICT CSS & HOVER CONTRAST CONTRACT
+
+- **NO INVISIBLE TEXT ON HOVER:** Every hover background change MUST explicitly define a contrasting text color.
+  - Example: `bg-slate-900 text-white hover:bg-orange-500 hover:text-white`
+  - Example for secondary buttons: `bg-white text-slate-900 border border-slate-200 hover:bg-slate-900 hover:text-white`
+- Never rely on `color: inherit` for interactive `<a>` / `<button>` CTAs — set explicit `color` on base **and** hover/focus/active.
+- **NAVIGATION TABS (actions):** Active `bg-zinc-900 text-white rounded-xl px-5 py-2.5`. Inactive `border border-zinc-200 bg-transparent text-zinc-900 hover:bg-zinc-50 rounded-xl`.
+- **TIME FILTER PILLS:** Active/idle via `.nx-tab` (rounded-full zinc) — never Clementine.
+- Clementine CTAs: `bg-[#FF5E1A] text-white hover:bg-[#E55013] hover:text-white` — Book/Reserve/Buy only.
+- Secondary: `nx-btn-secondary` or `nx-btn-ghost` (zinc outline).
+- Hero outline on dark media: `border-white text-white hover:bg-zinc-900 hover:text-white` (never white-on-white).
+
+## FOOTER REQUIREMENT
+
+Every generated merchant storefront (`app/[vat]/...`) MUST include a rich, full-width footer containing: Business Hours, Address, Dynamic Map link, VAT ID, GDPR Privacy toggle, and Nexus OS platform badge.
+
+## ENTITY HIERARCHY
+
+- **Business Storefront** (`app/[vat]/...`) — merchant VAT entity with Discovery Hub.
+- **Individual Practitioner Profiles** (`app/[vat]/p/[slug]/...`) — doctors, coaches, artisans, tutors under the parent business.
+- Every clinic/service business SHOULD expose a Practitioner Roster with headshot, credentials, specialties, rating, and client count.
+- Hero CTAs (8-second attention span): Primary `"Book Open Slot"` · Secondary `"Explore Team & Services"`.
+- **Never confuse entities:** Patient Outcome Reviews ≠ Practitioner Profile Cards. A physician must never be labeled as a patient (or vice versa).
+
+## ENTITY HIERARCHY RULE (Merchants First)
+
+The primary merchant entity is always the registered Business/Clinic. Practitioners must always be linked to a parent VAT merchant and rendered within the parent clinic's staff directory (`Doctors & Specialists` tab). Merchant demos and default search results show **business cards only**; individual specialist bios appear only under an explicit user toggle (`UserControlledSearch` · View Specialists Nearby) or a dedicated dossiers subsection — never cluttering the main merchant directory grid. Catalog team sync lives in `src/data/merchants.ts` (`team: ['dr-amir-saeed', 'dr-noa-klein']` → Harbor Wellness).
+
+## GEO-TEMPORAL RULE
+
+Practitioners with multiple practice locations must index all locations in geographic searches and allow patients to switch location nodes on their profile (`TravelingProfessional` + `<LocationSwitcher/>`). AI manifests and GEO retrieval must expose every `practice_cities` / location node — never only the merchant HQ city.
+
+## ONBOARDING RULE
+
+The first-visit onboarding modal must use localStorage state (`nexus_onboarded_v1`) to avoid repeating popups for returning users. The dedicated offers page (`/offers`) must display merchant introductory rates cleanly without artificial urgency or clutter. Location preference is stored in `nexus_location_v1` and surfaced as a changeable pill on `/offers`.
+
+## OFFERS HUB DENSITY RULE
+
+`/offers` must render a dense responsive grid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-4`) from `mockOffers.ts` via `<OfferCard/>` — cover photo, distance, rating, struck original vs introductory price, discount badge, and exactly one Clementine Reserve CTA per card. Include search + category pills (All · Clinic · Beauty · Fitness · Legal) and `<CategoryBentoGrid/>` (7-card asymmetrical bento: Spa 2+Beauty 1 · Aesthetics 1+Medical 2 · Fitness+Recovery+Hair 1 each). No sparse single-card layouts and no drop shadows on catalogue cards.
+
+## CARD DENSITY RULE
+
+Offer and deal cards must optimize vertical height. Do not overlay redundant category text on images; use interactive favorite buttons and high-contrast discount tags instead. Omit multi-line body paragraphs under the price row. Every card cover must have a reliable image URL plus category fallback (`offerCoverFallback`) so no blank/grey boxes render. Rating + price share one metrics row. CTA verbs only (`Claim Offer` / `Book Rate`) — never restate the price already shown above.
+
+## ICON & DENSITY RULE
+
+Never use Unicode emojis for UI controls. Use vector SVGs (`lucide-react`) with glassmorphism overlays. Never repeat prices inside CTA buttons when the price is already displayed on the card metrics row.
+
+## BENTO & OVERLAY LEGIBILITY RULE
+
+Any text layered on top of imagery must include a dark gradient overlay (`bg-gradient-to-t from-black/85 via-black/40 to-transparent`) to guarantee AAA contrast legibility. Favorite buttons must use dark circles with vector SVG icons — never light/white circular backdrops that wash out on bright photos.
+
+## OVERLAY CONTRAST RULE
+
+Never use slate-gray (#4B4D4E) for image overlays. Always use pitch black (`bg-black` or `#000000`) for heart containers and discount badges to maintain high contrast and clean visual hierarchy.
+
+## VISUAL ENERGY RULE
+
+Imagery in bento banners must be vivid, high-saturation, and energetic. Prefer focused bottom-third gradients over muddy full-bleed dark overlays.
+
+## EDITORIAL IMAGERY RULE
+
+Bento and promotional banners must use editorial high-fashion imagery. Tags/pills must use uppercase `text-xs tracking-wider font-bold` with dark background badges (`bg-black/80`) to guarantee legibility — never `text-[10px]` microscopic pills.
+
+## HEADER NAVIGATION RULE
+
+Header search bars must unify text search and location selection inside a single command pill container. Category ribbons must be sticky, use vector SVG icons (`lucide-react`), and display active states with crisp high-contrast pills (`bg-black text-white`).
+
+## NAV RIBBON & DISCOUNT FILTER RULE
+
+Category ribbons must span 100% viewport width with a `flex-1` scroll container and mask gradients. Always provide an inline discount % quick-filter toggle (30%+, 50%+, 70%+) styled with high-contrast active buttons (`bg-[#FF5E1A]`). Typography inside category pills must be bold (`font-bold text-zinc-800`). Count badges must stay high-contrast and scannable.
+
+## HOSPITALITY DATA RULE
+
+Hotel cards must highlight stay duration and room type. Restaurant cards must display cuisine type and price tier. CTAs must adjust dynamically (`Check Availability` for hotels, `Reserve Table` for dining). Types live in `types/offer.ts` (`hotelDetails` / `restaurantDetails`); dedicated routes at `/hotels` and `/restaurants`.
+
+## OFFER DETAILS PAGE (PDP) RULE
+
+Every offer page must outperform generic legacy competitors with a 2-column conversion layout. Left column includes radio-card package selectors, visual feature tags, and verified merchant metrics. Right column must contain a sticky checkout widget with live countdown, line-item promo breakdown, and prominent `#FF5E1A` action buttons. Route: `/offers/[slug]` via `<OfferDetailClient/>`. Hub cards link to `/offers/{id}`.
+
+Rating badges must be clickable (smooth-scroll to `#reviews-section` and/or open a full verified-reviews modal). Gallery images, review photos, AI consensus tags, and review copy MUST be category-aligned — never show spa/massage media on consulting, legal, clinic, dining, or hotel offers (`buildOfferDetail` category media pools).
+
+Every PDP must include an **About [Merchant]** hub (`MerchantAndTermsSection`): official website (`target="_blank" rel="noopener noreferrer"`), Nexus storefront `/merchants/[merchant-id]`, and action bar (Website · Directions · Contact). Plan options on PDPs MUST use `<OfferOptionsAccordion/>` (`src/components/offers/OfferOptionsAccordion.tsx`) wrapped in `<PremiumOfferCardWrapper/>`: soft emerald depth (`border-emerald-500/40` + ring + ambient shadow) — never hard `border-2 border-emerald-600`. Bottom pricing/action footers MUST use `rounded-b-2xl`; flush top step headers MUST use `rounded-t-2xl` via `<CheckoutStepHeader/>` (`src/components/checkout/CheckoutStepHeader.tsx`) — Apple HIG segmented tracker (zinc track + white active pill). AdaptiveContainer / premium cards SHOULD use `overflow-hidden` with portaled DatePicker. One expanded selling engine (inclusions via `<OfferInclusionsGrid/>`, qty stepper, multi-pack 10% at qty≥2, For Myself / Gift + DatePicker); collapsed cards stay dense with title, unique perk pills only (never duplicate Instant Voucher vs metadata), price/savings, and "Select & View". Support `badgeTag` (MOST POPULAR / BEST VALUE / RECOMMENDED). Inclusion lists MUST use `<OfferInclusionsGrid/>` — single-line truncate, ≤28 chars, promise-free sanitizer (`guarantee|promise|permanent|risk-free|instant results` scrubbed). For Myself MUST expose `<DualBookingEngine/>` — **Buy Open Voucher** (default) vs **Reserve Time Slot Now** (DatePicker + slot grid) plus cancellation/reschedule policy notice. Live totals sync to sticky checkout. Gift/slot dates MUST use portaled `<DatePicker/>` (`@radix-ui/react-popover` Portal) — never native `<input type="date">`. Legacy stacked cards: `<OfferOptionCard/>` for single-option surfaces only.
+
+## COMPLIANCE RULE (New Patient Offers / Medical Promotions)
+
+New-patient / first-visit rates for medical and regulated professions MUST display a 100% refund guarantee clause if the client is evaluated as unsuitable for the treatment. Render via `<NewPatientOfferCard/>` with `refundGuaranteeNote` always visible — never ship a regulated first-visit offer without this clause.
+
+## PROFESSIONAL LANGUAGE RULE
+
+Avoid theatre, daily deal, or event terminology ('passes left', 'claim voucher', 'intro pass'). Use clear, patient-friendly medical/legal terminology ('slots available', 'new patient rate', 'book consultation'). Role badges must accurately match the practitioner's specific license type (PT, Podiatrist, MD, Attorney) via `resolveRoleBadge()` — never default every clinic professional to Attending Physician.
+
+## TRUST RULE (Government License Verification)
+
+Practitioner medical/professional licenses MUST NOT be rendered as unverified plain text. Render each government license **exactly once** via `<CompactLicenseBadge/>` (through `<VerifiedCredentials/>`) — a slim, light, border-based ribbon (`border-zinc-200/80`, `shadow-none`). Never duplicate license UI (no dark hero seal + second Official Registry card). Never ship giant 400px license containers or `bg-zinc-900` credential boxes on practitioner profiles. Never ship "MD" / "Board Certified" claim bullets without structured `CredentialLicense` metadata (`authorityName`, `licenseNumber`, `jurisdiction`, `status`, `lastVerifiedAt`, `officialRegistryUrl`).
+
+## TONE RULE (Storefront Copy)
+
+Avoid regulatory or aggressive compliance language on storefronts. Frame credentials using professional marketing terms matched to industry:
+- **Medical:** Official Registry & Accreditations
+- **Artisan:** Camera di Commercio & Albo Artigiani
+- **Legal:** Bar Association Accreditation
+- **Trainer:** Certified Specialist & Credentials
+- **Educator:** Teaching Credentials & Accreditations
+
+Practitioner profiles are multi-industry professional dossiers (`MultiProfessionalDossier` + `<ProfessionalBento/>`) — users should never need LinkedIn for career, education, languages, or specialties.
+
+## DESIGN RULE (Testimonials / Outcomes)
+
+Every testimonial quote MUST be structurally bound inside the same card/container as its author's metadata and rating. Unanchored floating quotes across white space are strictly forbidden.
+
+Outcome cards (Apple bento): Header (headshot + name + verified badge) → Body (quote + ★★★★★) → Media (video thumb + glassmorphic play) — one self-contained unit.
+
+## MEDIA FRAMING RULE (Apple HIG / Stockholm)
+
+- Cards: `rounded-2xl`, `overflow-hidden`, `border border-zinc-200/80`, **no shadow**.
+- Offer images: fixed aspect (`aspect-video` or `aspect-[4/3]`) with `object-cover` — never let malformed media warp the layout.
+
+## UNIFIED STOREFRONT ARCHITECTURE (Mandatory)
+
+Merchant pages MUST follow this vertical stack — keep above-the-fold dense; avoid infinite vertical catalog clutter:
+
+1. **Hero Header** — dynamic background overlay, crisp white typography, live capacity badge, proximity ETA pill.
+2. **Value & Trust Ribbon** — 4-column metric grid (Verified Business, Same-Day Assurance, Customer Rating, Geo-Distance).
+3. **Tabbed Discovery Hub** — `[ Services & Consults ]` · `[ Doctors & Specialists ]` · `[ Products & Kits ]` (one grid at a time).
+4. **Live Proximity & Location Hub** — Leaflet canvas OR high-contrast location card with photo + ETA + navigation (never a blank white box).
+5. **Universal Footer Engine** — operational details, terms, consent controls.
+
+## LAYOUT RULE
+
+Never render a single card inside a multi-column empty container. Always scale grid items dynamically based on array length:
+- **1 item** = Spotlight Hero Card (split visual + full description / 1-tap CTA, full container width)
+- **2 items** = Half-and-Half / 2-column split grid
+- **3+ items** = Balanced 3-column grid with overflow scroll/carousel on smaller viewports
+
+## ANTI-PPC TRUST ENGINE
+
+Storefront offer cards MUST surface verified human-demand proof (real views / bookings density + anti-bot checkout), never click-farm vanity metrics. Every merchant page MUST inject Schema.org `@graph` (LocalBusiness / MedicalClinic / Product / Offer / AggregateRating) and expose `/api/ai-manifest?vat=` for generative-engine retrieval.

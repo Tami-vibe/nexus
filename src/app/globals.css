@@ -1,0 +1,348 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f9f9fb;
+  --paper-elevated: #ffffff;
+  --ink: #09090b;
+  --ink-soft: #3f3f46;
+  --muted: #71717a;
+  --line: rgba(24, 24, 27, 0.12); /* zinc-200/80-ish */
+  --accent: #ff5e1a;
+  --accent-deep: #e55013;
+  --accent-soft: #fff0e9;
+  --danger: #b42318;
+  --success: #ff5e1a;
+  --radius: 12px; /* rounded-xl action geometry */
+  --font-display: var(--font-display), "Times New Roman", serif;
+  --font-body: var(--font-body), "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  /* Stockholm: flat paper — no decorative glow washes */
+  background: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Full-bleed category ribbon scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mask-fade-x {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12px,
+    #000 calc(100% - 28px),
+    transparent
+  );
+}
+
+/* Do NOT set color: inherit — it overrides Tailwind text-* on <a> and causes
+   white-on-white / black-on-black hover regressions. */
+a {
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.nx-container {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin-inline: auto;
+}
+
+.nx-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.nx-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+/* ——— Stockholm buttons: actions only, rounded-xl, shadowless ——— */
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.75rem 1.25rem; /* px-5 py-3 */
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.nx-btn:hover {
+  transform: none;
+}
+
+.nx-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Primary — Clementine. ONE per visible viewport section. Book / Reserve / Buy only. */
+.nx-btn-primary,
+.nx-btn-accent {
+  background: #ff5e1a;
+  color: #ffffff;
+  border-color: #ff5e1a;
+  box-shadow: none;
+}
+
+.nx-btn-primary:hover,
+.nx-btn-accent:hover {
+  background: #e55013;
+  color: #ffffff;
+  border-color: #e55013;
+  box-shadow: none;
+}
+
+/* Secondary — solid Obsidian */
+.nx-btn-secondary {
+  background: #18181b; /* zinc-900 */
+  color: #ffffff;
+  border-color: #18181b;
+  box-shadow: none;
+}
+
+.nx-btn-secondary:hover {
+  background: #09090b;
+  color: #ffffff;
+  border-color: #09090b;
+}
+
+/* Secondary — outlined zinc */
+.nx-btn-ghost {
+  background: transparent;
+  color: #18181b;
+  border: 1px solid #d4d4d8; /* zinc-300 */
+  box-shadow: none;
+}
+
+.nx-btn-ghost:hover {
+  background: #fafafa; /* zinc-50 */
+  color: #18181b;
+  border-color: #d4d4d8;
+}
+
+/* Hero outline on dark media */
+.nx-btn-hero-outline {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: none;
+}
+
+.nx-btn-hero-outline:hover {
+  background: #18181b;
+  color: #ffffff;
+  border-color: #18181b;
+}
+
+/* ——— Pills: non-clickable tags / filters / states (rounded-full) ——— */
+.nx-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem; /* px-3 py-1 */
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  background: #f4f4f5; /* zinc-100 */
+  color: #3f3f46; /* zinc-700 */
+  border: 0;
+  box-shadow: none;
+}
+
+.nx-pill-active {
+  background: #18181b;
+  color: #ffffff;
+}
+
+/* Time / filter chips that ARE clickable still use pill geometry, monochrome */
+.nx-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.nx-tab-active {
+  background: #18181b;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.nx-tab-active:hover {
+  background: #09090b;
+  color: #ffffff;
+}
+
+.nx-tab-idle {
+  background: #f4f4f5;
+  color: #3f3f46;
+}
+
+.nx-tab-idle:hover {
+  background: #e4e4e7;
+  color: #18181b;
+}
+
+.nx-card {
+  background: var(--paper-elevated);
+  border: 1px solid rgba(228, 228, 231, 0.9); /* border-zinc-200/80 */
+  border-radius: 1rem;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.nx-media-card {
+  background: #ffffff;
+  border: 1px solid rgba(228, 228, 231, 0.9);
+  border-radius: 1rem;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.nx-media-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  background: #f4f4f5;
+}
+
+.nx-media-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.nx-pulse-dot {
+  position: relative;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #22c55e; /* live capacity green indicator only */
+  box-shadow: none;
+}
+
+.nx-pulse-dot.is-estimated {
+  background: #a1a1aa;
+}
+
+@keyframes nx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nx-drawer-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.nx-drawer-panel {
+  animation: nx-drawer-in 0.28s ease-out both;
+}
+
+@keyframes nx-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-nx-fade-in {
+  animation: nx-fade-in 180ms ease-out both;
+}
+
+.nx-rise {
+  animation: nx-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nx-rise-delay-1 { animation-delay: 80ms; }
+.nx-rise-delay-2 { animation-delay: 160ms; }
+.nx-rise-delay-3 { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
