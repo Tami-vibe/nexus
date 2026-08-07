@@ -14,6 +14,15 @@ function createRedis() {
 
 export const redis: Redis = global.__nexusRedis ?? createRedis();
 
+// ioredis emits connection failures as an "error" event on the client itself,
+// separate from any promise a caller might await. Without a listener here,
+// Node treats it as an unhandled error and crashes the whole process/request
+// — including requests that never touched Redis. This keeps a Redis outage
+// non-fatal until a real REDIS_URL is configured.
+redis.on("error", (err) => {
+  console.error("[redis] connection error (non-fatal):", err.message);
+});
+
 if (process.env.NODE_ENV !== "production") {
   global.__nexusRedis = redis;
 }
